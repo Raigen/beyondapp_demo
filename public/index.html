@@ -108,7 +108,8 @@
       const url = new URL(document.location);
       const access_token_url = url.searchParams.get("access_token_url");
       const code = url.searchParams.get("code");
-      (async function() {
+
+      async function registerBeyond() {
         const headers = new Headers();
         headers.append(
           "Authorization",
@@ -126,7 +127,7 @@
         });
         const answer = await response.json();
         console.log(answer);
-      })();
+      }
 
       document.addEventListener("DOMContentLoaded", function() {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
@@ -152,6 +153,9 @@
         };
         const ui = new firebaseui.auth.AuthUI(firebase.auth());
         firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            registerBeyond();
+          }
           if (!user) {
             ui.start("#firebaseui-auth-container", uiConfig);
           }
