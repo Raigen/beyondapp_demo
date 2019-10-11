@@ -78,6 +78,13 @@
         }
       }
     </style>
+
+    <script src="https://cdn.firebase.com/libs/firebaseui/4.2.0/firebaseui.js"></script>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://cdn.firebase.com/libs/firebaseui/4.2.0/firebaseui.css"
+    />
   </head>
   <body>
     <div id="message">
@@ -92,6 +99,7 @@
       >
     </div>
     <p id="load">Firebase SDK Loading&hellip;</p>
+    <div id="firebaseui-auth-container"></div>
 
     <script>
       const client_id = "a98e368d-fef0-4232-95f9-91d4e0bcf92e";
@@ -130,6 +138,24 @@
         // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
         //
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+        const uiConfig = {
+          signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+          // Do not use the default credentialHelper AccountChooser.
+          credentialHelper: firebaseui.auth.CredentialHelper.NONE,
+          callbacks: {
+            // Do nothing after a successful signin.
+            signInSuccessWithAuthResult: function() {
+              return false;
+            }
+          }
+        };
+        const ui = new firebaseui.auth.AuthUI(firebase.auth());
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (!user) {
+            ui.start("#firebaseui-auth-container", uiConfig);
+          }
+        });
 
         try {
           let app = firebase.app();
