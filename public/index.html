@@ -12,6 +12,7 @@
     <script defer src="/__/firebase/7.2.0/firebase-database.js"></script>
     <script defer src="/__/firebase/7.2.0/firebase-messaging.js"></script>
     <script defer src="/__/firebase/7.2.0/firebase-storage.js"></script>
+    <script defer src="/__/firebase/7.2.0/firebase-firestore.js"></script>
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
@@ -108,6 +109,8 @@
       const url = new URL(document.location);
       const access_token_url = url.searchParams.get("access_token_url");
       const code = url.searchParams.get("code");
+      const api_url = url.searchParams.get("api_url");
+      const return_url = url.searchParams.get("return_url");
 
       async function registerBeyond() {
         const headers = new Headers();
@@ -126,7 +129,18 @@
           body
         });
         const answer = await response.json();
-        console.log(answer);
+
+        const db = firebase.firestore();
+        await db
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .set({
+            api_url,
+            access_token: answer.access_token,
+            refresh_token: answer.refresh_token
+          });
+
+        document.location.replace(return_url);
       }
 
       document.addEventListener("DOMContentLoaded", function() {
