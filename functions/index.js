@@ -2,9 +2,6 @@ const functions = require('firebase-functions');
 const request = require('request-promise-native');
 const admin = require('firebase-admin');
 
-const client_id = '0BE38CFF-F3B6-4D68-8F16-1CE270C028BC';
-const client_secret = 'DkRUi6uo6KzglHmwOhFkVYNhcumCTOlP';
-
 admin.initializeApp()
 
 async function getBeyondAuthToken(access_token_url, code, signature, client_id, client_secret) {
@@ -34,6 +31,7 @@ function generateSignature(code, access_token_url, client_secret) {
 
 exports.installBeyondApp = functions.https.onCall(async (data, context) => {
     const {access_token_url, code, api_url, signature} = data;
+    const { client_id, client_secret } = functions.config().beyond
     const uid = context.auth.uid;
 
     const response = await getBeyondAuthToken(access_token_url, code, signature, client_id, client_secret);
