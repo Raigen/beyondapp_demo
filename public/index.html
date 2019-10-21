@@ -11,6 +11,7 @@
     <script defer src="/__/firebase/7.2.0/firebase-auth.js"></script>
     <script defer src="/__/firebase/7.2.0/firebase-database.js"></script>
     <script defer src="/__/firebase/7.2.0/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/7.2.0/firebase-functions.js"></script>
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
@@ -25,10 +26,6 @@
     <div id="firebaseui-auth-container"></div>
 
     <script>
-      const client_id = "a98e368d-fef0-4232-95f9-91d4e0bcf92e";
-      // This secret is of course not valid
-      const client_secret = "s7orug8aiohdqo30v71o91o5fi";
-
       const url = new URL(document.location);
       const access_token_url = url.searchParams.get("access_token_url");
       const code = url.searchParams.get("code");
@@ -36,32 +33,8 @@
       const return_url = url.searchParams.get("return_url");
 
       async function registerBeyond() {
-        const headers = new Headers();
-        headers.append(
-          "Authorization",
-          "Basic " + btoa(client_id + ":" + client_secret)
-        );
-
-        const body = new FormData();
-        body.append("grant_type", "authorization_code");
-        body.append("code", code);
-
-        const response = await fetch(access_token_url, {
-          method: "POST",
-          headers,
-          body
-        });
-        const answer = await response.json();
-
-        const db = firebase.firestore();
-        await db
-          .collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .set({
-            api_url,
-            access_token: answer.access_token,
-            refresh_token: answer.refresh_token
-          });
+        const installBeyondApp = firebase.functions().httpsCallable('installBeyondApp');
+        const result = await installBeyondApp({ access_token_url, code, api_url });
 
         document.location.replace(return_url);
       }
